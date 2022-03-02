@@ -1,20 +1,22 @@
 <?php
 
 /*
- * This file is part of SkeletonBundle.
+ * This file is part of WatermarkBundle.
  *
- * (c) John Doe
- *
- * @license LGPL-3.0-or-later
+ * @package   WatermarkBundle
+ * @author    Marcel Mathias Nolte
+ * @copyright Marcel Mathias Nolte 2015-2020
+ * @website	  https://github.com/marcel-mathias-nolte
+ * @license   LGPL-3.0-or-later
  */
 
-namespace MarcelMathiasNolte\SkeletonBundle\ContaoManager;
+namespace MarcelMathiasNolte\WatermarkBundle\ContaoManager;
 
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
-use MarcelMathiasNolte\SkeletonBundle\ContaoSkeletonBundle;
+use MarcelMathiasNolte\WatermarkBundle\WatermarkBundle;
 
 class Plugin implements BundlePluginInterface
 {
@@ -24,7 +26,7 @@ class Plugin implements BundlePluginInterface
     public function getBundles(ParserInterface $parser)
     {
         return [
-            BundleConfig::create(ContaoSkeletonBundle::class)
+            BundleConfig::create(WatermarkBundle::class)
                 ->setLoadAfter([ContaoCoreBundle::class]),
         ];
     }
