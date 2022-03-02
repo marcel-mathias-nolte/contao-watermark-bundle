@@ -12,18 +12,14 @@
 
 namespace MarcelMathiasNolte\WatermarkBundle;
 
-use Contao\CoreBundle\ServiceAnnotation\Hook;
+use Contao\Config;
 use Contao\Image;
 use Contao\File;
-use OMOSde\ContaoOmImagineBundle\Imagine;
-use OMOSde\ContaoOmImagineBundle\OmImagineModel;
+use Imagine\Gd\Imagine as GdImagine;
 
-/**
- * @Hook("getImage")
- */
-class WatermarkService extends Imagine
+class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
 {
-    public function __invoke(
+    public function getImage(
         $originalPath,
         $width,
         $height,
@@ -32,17 +28,19 @@ class WatermarkService extends Imagine
         $force = false
     )
     {
-        $objImagine = OmImagineModel::findBy(['published=?', 'directory<>""'], [1]);
-        if (!is_object($objImagine))
+        $objImagine = \OMOSde\ContaoOmImagineBundle\OmImagineModel::findBy(['published=?', 'directory<>""'], [1]);
+
+		if (!is_object($objImagine))
         {
             return null;
         }
-        // do for all active manipulations
+		// do for all active manipulations
         foreach ($objImagine as $objManipulation)
         {
             // get all active actions for this manipulation and check next if none exists
-            $objActions = OmImagineActionModel::findBy(['pid=?', 'active=1'], [$objManipulation->id], ['order' => 'sorting ASC']);
-            if (!$objActions)
+            $objActions = \OMOSde\ContaoOmImagineBundle\OmImagineActionModel::findBy(['pid=?', 'active=1'], [$objManipulation->id], ['order' => 'sorting ASC']);
+         
+			if (!$objActions)
             {
                 continue;
             }
@@ -51,6 +49,7 @@ class WatermarkService extends Imagine
             $objDirectories = \FilesModel::findMultipleByIds(deserialize($objManipulation->directory, true));
             if (!$objDirectories)
             {
+				var_dump($objDirectories); die();
                 continue;
             }
 
@@ -65,11 +64,33 @@ class WatermarkService extends Imagine
             // check if the file exists
             if (!file_exists($strFile))
             {
+				var_dump($strFile); die();
                 continue;
             }
             if (!file_exists(TL_ROOT . '/' . $target))
-            {
-                continue;
+            {				var_dump(TL_ROOT . '/' . $target); die();
+				if ($image->getImagine() instanceof GdImagine) {
+					$dimensions = $image->getDimensions();
+
+					/** @var Config $config */
+					$config = $this->framework->getAdapter(Config::class);
+					$gdMaxImgWidth = $config->get('gdMaxImgWidth');
+					$gdMaxImgHeight = $config->get('gdMaxImgHeight');
+
+					// Return the path to the original image if it cannot be handled
+					if (
+						$dimensions->getSize()->getWidth() > $gdMaxImgWidth
+						|| $dimensions->getSize()->getHeight() > $gdMaxImgHeight
+						|| $coordinates->getSize()->getWidth() > $gdMaxImgWidth
+						|| $coordinates->getSize()->getHeight() > $gdMaxImgHeight
+					) {
+						return $this->createImage($image, $image->getPath());
+					}
+				}
+
+				return parent::executeResize($image, $coordinates, $path, $options);
+
+				continue;
             }
 
             // get path info of file
@@ -89,7 +110,6 @@ class WatermarkService extends Imagine
                 {
                     continue;
                 }
-
                 self::handleActions(TL_ROOT . '/' . $target, $objManipulation, $objActions);
             }
         }

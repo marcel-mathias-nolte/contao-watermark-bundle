@@ -9,3 +9,7 @@
  * @website	  https://github.com/marcel-mathias-nolte
  * @license   LGPL-3.0-or-later
  */
+
+namespace MarcelMathiasNolte\WatermarkBundle;
+
+$GLOBALS['TL_HOOKS']['getImage'][] = ['MarcelMathiasNolte\WatermarkBundle\WatermarkService', 'getImage'];
