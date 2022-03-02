@@ -39,7 +39,7 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
         {
             // get all active actions for this manipulation and check next if none exists
             $objActions = \OMOSde\ContaoOmImagineBundle\OmImagineActionModel::findBy(['pid=?', 'active=1'], [$objManipulation->id], ['order' => 'sorting ASC']);
-         
+
 			if (!$objActions)
             {
                 continue;
@@ -68,7 +68,8 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
                 continue;
             }
             if (!file_exists(TL_ROOT . '/' . $target))
-            {				var_dump(TL_ROOT . '/' . $target); die();
+            {
+                var_dump(TL_ROOT . '/' . $target); die();
 				if ($image->getImagine() instanceof GdImagine) {
 					$dimensions = $image->getDimensions();
 
@@ -84,12 +85,14 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
 						|| $coordinates->getSize()->getWidth() > $gdMaxImgWidth
 						|| $coordinates->getSize()->getHeight() > $gdMaxImgHeight
 					) {
-						return $this->createImage($image, $image->getPath());
+						$strFile =  $this->createImage($image, $image->getPath());
+						var_dump(1); var_dump($strFile); die();
 					}
 				}
 
-				return parent::executeResize($image, $coordinates, $path, $options);
+				$strFile = parent::executeResize($image, $coordinates, $path, $options);
 
+                var_dump(2); var_dump($strFile); die();
 				continue;
             }
 
