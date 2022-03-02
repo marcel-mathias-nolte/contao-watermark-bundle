@@ -21,6 +21,8 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.10",
+        "omosde/contao-om-imagine": "dev-master",
+        "contao/core-bundle": "^4.10",
         "contao-community-alliance/composer-plugin": "^2.4.0 || 3.*"
     },
     "require-dev": {
