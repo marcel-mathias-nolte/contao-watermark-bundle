@@ -7,3 +7,8 @@ services:
         Symfony\Component\DependencyInjection\ContainerAwareInterface:
             calls:
                 - ["setContainer", ["@service_container"]]
+
+    MarcelMathiasNolte\WatermarkBundle\PictureFactory
+        decorates: contao.image.picture_factory
+        arguments:
+            - '@MarcelMathiasNolte\WatermarkBundle\PictureFactory.inner'

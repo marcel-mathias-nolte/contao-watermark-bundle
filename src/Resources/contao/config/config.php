@@ -12,4 +12,5 @@
 
 namespace MarcelMathiasNolte\WatermarkBundle;
 
-$GLOBALS['TL_HOOKS']['getImage'][] = ['MarcelMathiasNolte\WatermarkBundle\WatermarkService', 'getImage'];
+$GLOBALS['TL_HOOKS']['getImage'][] = ['MarcelMathiasNolte\WatermarkBundle\Watermark', 'getImage'];
+$GLOBALS['TL_HOOKS']['executeResize'][] = ['MarcelMathiasNolte\WatermarkBundle\Watermark', 'executeResize'];
