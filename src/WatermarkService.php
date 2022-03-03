@@ -69,7 +69,6 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
             }
             if (!file_exists(TL_ROOT . '/' . $target))
             {
-                var_dump(TL_ROOT . '/' . $target); die();
 				if ($image->getImagine() instanceof GdImagine) {
 					$dimensions = $image->getDimensions();
 
