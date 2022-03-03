@@ -34,6 +34,35 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
         {
             return null;
         }
+
+
+
+        $strFile = TL_ROOT . '/' . $originalPath;
+
+        // check if the file exists
+        if (!file_exists($strFile))
+        {
+            return null;
+        }
+        if (!file_exists(TL_ROOT . '/' . $target))
+        {
+            return null;
+        }
+
+        $arrPathInfo = pathinfo(TL_ROOT . '/' . $target);
+        $target2 = substr($target, 0, strlen($target) - strlen($arrPathInfo['extension'])) . 'watermark.' . $arrPathInfo['extension'];
+
+        // get path info of file
+        $arrPathInfo = pathinfo(TL_ROOT . '/' . $target2);
+
+        // check file extension
+        if (!in_array(strtolower($arrPathInfo['extension']), ['gif', 'jpg', 'png']))
+        {
+            return null;
+        }
+
+        copy(TL_ROOT . '/' . $target, TL_ROOT . '/' . $target2);
+
 		// do for all active manipulations
         foreach ($objImagine as $objManipulation)
         {
@@ -49,7 +78,6 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
             $objDirectories = \FilesModel::findMultipleByIds(deserialize($objManipulation->directory, true));
             if (!$objDirectories)
             {
-				var_dump($objDirectories); die();
                 continue;
             }
 
@@ -59,28 +87,6 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
                 $arrDirectories[] = $directory->path;
             }
 
-            $strFile = TL_ROOT . '/' . $originalPath;
-
-            // check if the file exists
-            if (!file_exists($strFile))
-            {
-				var_dump($strFile); die();
-                continue;
-            }
-            if (!file_exists(TL_ROOT . '/' . $target))
-            {
-				continue;
-            }
-
-            // get path info of file
-            $arrPathInfo = pathinfo($strFile);
-
-            // check file extension
-            if (!in_array(strtolower($arrPathInfo['extension']), ['gif', 'jpg', 'png']))
-            {
-                continue;
-            }
-
             foreach ($arrDirectories as $strDirectory)
             {
                 //
@@ -88,10 +94,10 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
                 {
                     continue;
                 }
-                self::handleActions(TL_ROOT . '/' . $target, $objManipulation, $objActions);
+                self::handleActions(TL_ROOT . '/' . $target2, $objManipulation, $objActions);
             }
         }
 
-        return null;
+        return $target2;
     }
 }
