@@ -12,8 +12,14 @@
 
 namespace MarcelMathiasNolte\WatermarkBundle;
 
+use MarcelMathiasNolte\WatermarkBundle\DependencyInjection\WatermarkBundleExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class WatermarkBundle extends Bundle
 {
+
+    public function getContainerExtension(): WatermarkBundleExtension
+    {
+        return new WatermarkBundleExtension();
+    }
 }
