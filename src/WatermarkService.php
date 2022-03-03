@@ -69,29 +69,6 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
             }
             if (!file_exists(TL_ROOT . '/' . $target))
             {
-				if ($image->getImagine() instanceof GdImagine) {
-					$dimensions = $image->getDimensions();
-
-					/** @var Config $config */
-					$config = $this->framework->getAdapter(Config::class);
-					$gdMaxImgWidth = $config->get('gdMaxImgWidth');
-					$gdMaxImgHeight = $config->get('gdMaxImgHeight');
-
-					// Return the path to the original image if it cannot be handled
-					if (
-						$dimensions->getSize()->getWidth() > $gdMaxImgWidth
-						|| $dimensions->getSize()->getHeight() > $gdMaxImgHeight
-						|| $coordinates->getSize()->getWidth() > $gdMaxImgWidth
-						|| $coordinates->getSize()->getHeight() > $gdMaxImgHeight
-					) {
-						$strFile =  $this->createImage($image, $image->getPath());
-						var_dump(1); var_dump($strFile); die();
-					}
-				}
-
-				$strFile = parent::executeResize($image, $coordinates, $path, $options);
-
-                var_dump(2); var_dump($strFile); die();
 				continue;
             }
 
@@ -104,7 +81,6 @@ class WatermarkService extends \OMOSde\ContaoOmImagineBundle\Imagine
                 continue;
             }
 
-            //
             foreach ($arrDirectories as $strDirectory)
             {
                 //
