@@ -8,7 +8,8 @@ services:
             calls:
                 - ["setContainer", ["@service_container"]]
 
-    MarcelMathiasNolte\WatermarkBundle\PictureFactory
+    contao.image.picture_factory_watermark
+        class: MarcelMathiasNolte\WatermarkBundle\PictureFactory
         decorates: contao.image.picture_factory
         arguments:
             - '@MarcelMathiasNolte\WatermarkBundle\PictureFactory.inner'
