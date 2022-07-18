@@ -16,6 +16,7 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use MarcelMathiasNolte\ContaoPushBundleNews4wardAdapterBundle\ContaoPushBundleNews4wardAdapterBundle;
 use MarcelMathiasNolte\WatermarkBundle\WatermarkBundle;
 
 class Plugin implements BundlePluginInterface

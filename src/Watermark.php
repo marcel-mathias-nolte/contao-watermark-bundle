@@ -13,160 +13,81 @@
 
 namespace MarcelMathiasNolte\WatermarkBundle;
 
-use Contao\Config;
-use Contao\Image;
-use Contao\File;
-use Contao\Image\Image as NewImage;
-use Contao\Image\ResizeConfiguration;
-use Contao\System;
-use Imagine\Gd\Imagine as GdImagine;
+use Imagine\Image\AbstractFont;
+use Imagine\Image\Box;
+use Imagine\Image\Palette\RGB;
+use Imagine\Image\Point;
 
-class Watermark extends \OMOSde\ContaoOmImagineBundle\Imagine
+class Watermark
 {
-    public function executeResize(\Contao\Image $parent) {
-        return null;
-        $image = $this->prepareImage($parent);
-        $resizeConfig = $this->prepareResizeConfig($parent);
-    }
-
-
-    /**
-     * Prepare image object.
-     *
-     * @return NewImage
-     */
-    protected function prepareImage(\Contao\Image $parent)
-    {
-        if ($parent->fileObj->isSvgImage)
-        {
-            $imagine = System::getContainer()->get('contao.image.imagine_svg');
-        }
-        else
-        {
-            $imagine = System::getContainer()->get('contao.image.imagine');
-        }
-
-        $image = new NewImage($parent->strRootDir . '/' . $parent->fileObj->path, $imagine, System::getContainer()->get('filesystem'));
-        $image->setImportantPart($parent->prepareImportantPart());
-
-        return $image;
-    }
-
-    /**
-     * Prepare resize configuration object.
-     *
-     * @return ResizeConfiguration
-     */
-    protected function prepareResizeConfig(\Contao\Image $parent)
-    {
-        $resizeConfig = new ResizeConfiguration();
-        $resizeConfig->setWidth($parent->targetWidth);
-        $resizeConfig->setHeight($parent->targetHeight);
-        $resizeConfig->setZoomLevel($parent->zoomLevel);
-
-        if (substr_count($parent->resizeMode, '_') === 1)
-        {
-            $resizeConfig->setMode(ResizeConfiguration::MODE_CROP);
-            $resizeConfig->setZoomLevel(0);
-        }
-        else
-        {
-            try
-            {
-                $resizeConfig->setMode($this->resizeMode);
-            }
-            catch (\Throwable $exception)
-            {
-                $resizeConfig->setMode(ResizeConfiguration::MODE_CROP);
-            }
-        }
-
-        return $resizeConfig;
-    }
-
-    public function getImage(
-        $originalPath,
-        $width,
-        $height,
-        $mode = '',
-        $target = null,
-        $file = null,
-		$targetPath = '',
-		$image = null
-    )
-    {
-        return null;
-        $objImagine = \OMOSde\ContaoOmImagineBundle\OmImagineModel::findBy(['published=?', 'directory<>""'], [1]);
-
-		if (!is_object($objImagine))
-        {
-            return null;
-        }
-
-
-
-        $strFile = TL_ROOT . '/' . $originalPath;
-
-        // check if the file exists
-        if (!file_exists($strFile))
-        {
-            return null;
-        }
-        if (!file_exists(TL_ROOT . '/' . $target))
-        {
-            return null;
-        }
-
-        $arrPathInfo = pathinfo(TL_ROOT . '/' . $target);
-        $target2 = substr($target, 0, strlen($target) - strlen($arrPathInfo['extension'])) . 'watermark.' . $arrPathInfo['extension'];
-
-        // get path info of file
-        $arrPathInfo = pathinfo(TL_ROOT . '/' . $target2);
-
-        // check file extension
-        if (!in_array(strtolower($arrPathInfo['extension']), ['gif', 'jpg', 'png']))
-        {
-            return null;
-        }
-
-        copy(TL_ROOT . '/' . $target, TL_ROOT . '/' . $target2);
-
-
-		// do for all active manipulations
-        foreach ($objImagine as $objManipulation)
-        {
-            // get all active actions for this manipulation and check next if none exists
-            $objActions = \OMOSde\ContaoOmImagineBundle\OmImagineActionModel::findBy(['pid=?', 'active=1'], [$objManipulation->id], ['order' => 'sorting ASC']);
-
-			if (!$objActions)
-            {
-                continue;
-            }
-
-            // check for directories
-            $objDirectories = \FilesModel::findMultipleByIds(deserialize($objManipulation->directory, true));
-            if (!$objDirectories)
-            {
-                continue;
-            }
-
-            // create an array with the target directories
-            foreach ($objDirectories as $directory)
-            {
-                $arrDirectories[] = $directory->path;
-            }
-
-            foreach ($arrDirectories as $strDirectory)
-            {
-                //
-                if (!strpos($arrPathInfo['dirname'], $strDirectory) !== false)
-                {
-                    continue;
+    public static function scanAssets() {
+        $watermark = new Watermark();
+        if (!is_dir(TL_ROOT . '/assets/images/watermark'))
+            mkdir(TL_ROOT . '/assets/images/watermark');
+        foreach (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'] as $f)
+            if (!is_dir(TL_ROOT . '/assets/images/watermark/' . $f))
+                mkdir(TL_ROOT . '/assets/images/watermark/' . $f);
+        foreach (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'] as $f) {
+            $fd = @opendir(TL_ROOT . '/assets/images/' . $f);
+            if ($fd) {
+                while ($file = readdir($fd)) {
+                    if ($file == '.' || $file == '..') continue;
+                    $full = TL_ROOT . '/assets/images/' . $f . '/' . $file;
+                    $wm = TL_ROOT . '/assets/images/watermark/' . $f . '/' . substr($file, 0, strlen($file) - 5);
+                    if (is_file($full) && (!file_exists($wm) || filemtime($wm) != filemtime($full))) {
+                        list($width, $height, $type, $attr) = getimagesize($full);
+                        if ($width > 285 && $height > 285) {
+                            if ($watermark->applyWatermarks($full)) {
+                                touch($wm, filemtime($full));
+                            }
+                        }
+                    }
                 }
-                self::handleActions(TL_ROOT . '/' . $target2, $objManipulation, $objActions);
+                closedir($fd);
             }
         }
+    }
+    
+    public function applyWatermarks($strTarget)
+    {
+        if (!file_exists($strTarget)) return;
+        try {
+            $this->addWatermark($strTarget);
+        }
+        catch (\Exception $ex) {
 
-        return $target2;
+        }
+        return true;
+    }
+
+
+    /**
+     * Add an image element to the uploaded image
+     *
+     * @param $strFile
+     */
+    protected function addWatermark($strFile)
+    {
+        $imagine = new \Imagine\Gd\Imagine();
+
+        $objImage = $imagine->open($strFile);
+        $objImageWatermark = $imagine->open(TL_ROOT . '/files/wasserzeichen.png');
+        $aspect = $objImage->getSize()->getWidth() / $objImage->getSize()->getHeight();
+        if ($aspect > 1) {
+            $wHeight = $objImage->getSize()->getHeight() / 5;
+            $Margin = $objImage->getSize()->getHeight() / 20;
+            $wWidth = $objImageWatermark->getSize()->getWidth() * $wHeight / $objImageWatermark->getSize()->getHeight();
+        } else {
+            $wWidth = $objImage->getSize()->getWidth() / 5;
+            $Margin = $objImage->getSize()->getWidth() / 20;
+            $wHeight = $objImageWatermark->getSize()->getHeight() * $wWidth / $objImageWatermark->getSize()->getWidth();
+        }
+        $objImageWatermark->resize(new Box($wWidth, $wHeight));
+        $arrMargin = deserialize($objAction->margins);
+        $objPosition = new Point(
+            $objImage->getSize()->getWidth() - $wWidth - $Margin,
+            $objImage->getSize()->getHeight() - $wHeight - $Margin);
+        $objImage->paste($objImageWatermark, $objPosition);
+        $objImage->save($strFile);
     }
 }

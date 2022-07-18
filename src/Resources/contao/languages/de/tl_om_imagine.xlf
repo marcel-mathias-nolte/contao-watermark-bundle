@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<xliff version="1.1">
+    <file datatype="php" original="src/Resources/contao/languages/en/tl_om_imagine.php" source-language="en" target-language="de">
+        <body>
+            <trans-unit id="tl_om_imagine.directory_resize.0">
+                <source>Directories for resizing</source>
+                <target>Verzeichnisse beim Resize</target>
+            </trans-unit>
+            <trans-unit id="tl_om_imagine.directory_resize.1">
+                <source>Please select one or more directories.</source>
+                <target>Bitte wählen Sie ein oder mehrere Verzeichnisse aus.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

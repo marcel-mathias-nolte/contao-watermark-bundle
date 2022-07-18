@@ -8,8 +8,8 @@ services:
             calls:
                 - ["setContainer", ["@service_container"]]
 
-    contao.image.picture_factory_watermark:
-        class: MarcelMathiasNolte\WatermarkBundle\PictureFactory
-        decorates: contao.image.picture_factory
-        arguments:
-            - '@contao.image.picture_factory_watermark.inner'
+#    contao.image.legacy_resizer_watermark:
+#        class: MarcelMathiasNolte\WatermarkBundle\LegacyResizer
+#        decorates: contao.image.legacy_resizer
+#        arguments:
+#            - '@contao.image.legacy_resizer_watermark.inner'

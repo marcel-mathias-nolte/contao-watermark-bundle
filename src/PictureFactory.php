@@ -9,15 +9,16 @@ use Contao\Image\ResizeConfiguration;
 use Contao\Image\ResizeOptions;
 use Contao\StringUtil;
 
-class PictureFactory  implements PictureFactoryInterface {
+class PictureFactory  implements \Contao\CoreBundle\Image\PictureFactoryInterface
+{
     protected \Contao\CoreBundle\Image\PictureFactoryInterface $parent;
-    public function __construct(\Contao\CoreBundle\Image\PictureFactoryInterface $parent) {
-        var_dump($parent); die();
+
+    public function __construct(\Contao\CoreBundle\Image\PictureFactoryInterface $parent)
+    {
         $this->parent = $parent;
     }
 
-
-    public function setDefaultDensities($densities): self
+    public function setDefaultDensities($densities)
     {
         return $this->parent->setDefaultDensities($densities);
     }
@@ -25,15 +26,17 @@ class PictureFactory  implements PictureFactoryInterface {
     /**
      * Sets the predefined image sizes.
      */
-    public function setPredefinedSizes(array $predefinedSizes): void
+    public function setPredefinedSizes(array $predefinedSizes)
     {
         $this->parent->setPredefinedSizes($predefinedSizes);
     }
 
     public function create($path, $size = null, ResizeOptions $options = null): PictureInterface
     {
+
+
         $tmp = $this->parent->create($path, $size, $options);
-        var_dump($tmp); die();
+
         return $tmp;
     }
 }
